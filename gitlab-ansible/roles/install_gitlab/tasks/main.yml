@@ -1,0 +1,26 @@
+---
+- name: set vars for community edition
+  ansible.builtin.include_tasks:
+    file: set-ce-edition.yml
+  when:
+    - gitlab_edition == 'community'
+- name: set vars for enterprise edition
+  ansible.builtin.include_tasks:
+    file: set-ee-edition.yml
+  when:
+    - gitlab_edition == 'enterprise'
+
+- name: import pre-tasks
+  ansible.builtin.import_tasks: install-prerequisites.yml
+  
+- name: import pre-tasks
+  ansible.builtin.import_tasks: import-gitlab-repo-key.yml
+
+- name: setup gitlab repo
+  ansible.builtin.import_tasks: setup-gitlab-repo.yml
+
+- name: install gitlab
+  ansible.builtin.import_tasks: install-gitlab.yml
+  
+- name: configure GitLab SSL and external URL
+  ansible.builtin.import_tasks: roles/install_gitlab/tasks/configure-gitlab-ssl.yml

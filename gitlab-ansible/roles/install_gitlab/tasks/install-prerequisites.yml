@@ -1,0 +1,10 @@
+---
+- name: install prerequisites
+  ansible.builtin.apt:
+    name:
+      - curl
+      - openssh-server
+      - ca-certificates
+      - perl
+      - gnupg
+  register: packages_installed

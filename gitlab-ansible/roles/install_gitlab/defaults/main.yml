@@ -1,0 +1,3 @@
+---
+gitlab_edition: 'community'
+gitlab_admin_password: "MySecurePassword"

@@ -1,0 +1,4 @@
+- name: Import GitLab GPG key for gitlab-ce repository
+  ansible.builtin.apt_key:
+    url: "https://packages.gitlab.com/gitlab/gitlab-ce/gpgkey"
+    state: present

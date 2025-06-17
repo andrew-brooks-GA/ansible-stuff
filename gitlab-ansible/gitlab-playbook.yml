@@ -1,0 +1,5 @@
+- name: install GitLab
+  become: true
+  hosts: gitlab.lan
+  roles:
+    - install_gitlab

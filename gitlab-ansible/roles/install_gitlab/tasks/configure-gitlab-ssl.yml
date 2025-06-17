@@ -1,0 +1,68 @@
+---
+- name: Disable Let's Encrypt in GitLab configuration
+  ansible.builtin.lineinfile:
+    path: /etc/gitlab/gitlab.rb
+    line: "letsencrypt['enable'] = false"
+    create: yes
+  become: true
+
+- name: Create /etc/gitlab/ssl directory
+  ansible.builtin.file:
+    path: /etc/gitlab/ssl
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+  become: true
+  
+- name: Ensure /etc/gitlab/ssl directory exists
+  ansible.builtin.file:
+    path: /etc/gitlab/ssl
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+  become: true
+
+- name: Generate a private key for GitLab certificate
+  community.crypto.openssl_privatekey:
+    path: /etc/gitlab/ssl/gitlab.lan.key
+    size: 2048
+    state: present
+  become: true
+
+- name: Generate self-signed certificate
+  community.crypto.x509_certificate:
+    path: /etc/gitlab/ssl/gitlab.lan.crt
+    privatekey_path: /etc/gitlab/ssl/gitlab.lan.key
+    provider: selfsigned
+  become: true
+  ignore_errors: true
+
+  
+- name: Remove immutable attribute from certificate (if set)
+  ansible.builtin.command: chattr -i /etc/gitlab/ssl/gitlab.lan.crt
+  become: true
+  ignore_errors: yes
+
+- name: Set permissions for GitLab certificate
+  ansible.builtin.file:
+    path: /etc/gitlab/ssl/gitlab.lan.crt
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Set permissions for GitLab key
+  ansible.builtin.file:
+    path: /etc/gitlab/ssl/gitlab.lan.key
+    owner: root
+    group: root
+    mode: '0600'
+  become: true
+
+- name: Reconfigure GitLab to apply new SSL settings and external URL
+  ansible.builtin.command: gitlab-ctl reconfigure
+  environment:
+    EXTERNAL_URL: "https://{{ inventory_hostname }}"
+  become: true
