@@ -1,6 +1,0 @@
-all:
-  children:
-    cicd:
-      hosts:
-        gitlab.lan:
-          ansible_host: 192.168.2.125
